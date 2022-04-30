@@ -3,9 +3,7 @@
 
 import random
 import time
-
 from paho.mqtt import client as mqtt_client
-
 
 broker = 'test.mosquitto.org'
 port = 1883
@@ -42,21 +40,21 @@ def publish(topic, msg):
         # print(f"Failed to send message to topic {topic}")
         return 0
 
-# def run():
-#     # publish
-#     # # client.loop_start()
-#     # publish(client)
+def run():
+    # publish
+    # # client.loop_start()
+    # publish(client)
     
-#     # subscribe
-#     subscribe()
-#     client.loop_start()
+    # subscribe
+    subscribe("est/si/sihs/weather")
+    client.loop_forever()
 
 def subscribe(topic):
     def on_message(client, userdata, msg):
         print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
-        return msg.payload.decode()
+        # return msg.payload.decode()
     client.subscribe(topic)
     client.on_message = on_message
 
-# if __name__ == '__main__':
-    # run()
+if __name__ == '__main__':
+    run()

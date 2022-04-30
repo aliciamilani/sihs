@@ -3,5 +3,7 @@ from weather_api import get_weather
 
 # API
 
-print(get_weather())
+response = get_weather()
+
+mqtt_connect.publish("est/si/sihs/weather", response)
 
