@@ -1,29 +1,25 @@
-from sqlalchemy import true
+#from sqlalchemy import true
 import mqtt_connect
 import time
 from weather_api import get_weather
-from step_motor import setStepMotor
 from sensor_dht11 import dht11_read
-from relay import turn_on, turn_off
-
-#flags
-relay_flag = "off"
-window_flag = "off"
-
-def set_relay(flag):
-    relay_flag = flag
-
-def set_window(flag):
-    window_flag = flag
+from control_relay_step import set_relay, set_window, read_relay_flag, read_window_flag
 
 list_bad_weather = ['rain', 'thunderstorm']
 
-mqtt_connect.start_subscribe("est/si/sihs/ajv/relay/cmd")
-mqtt_connect.start_subscribe("est/si/sihs/ajv/stepmotor/cmd")
+#mqtt_connect.start_subscribe("est/si/sihs/ajv/relay/cmd")
+#mqtt_connect.start_subscribe("est/si/sihs/ajv/stepmotor/cmd")
 
 while True:
+    
+    print("vai ler")
 
-    temp, humid = dht11_read.read_temp_humidity()
+    temp_humid = dht11_read.read_temp_humidity()
+    if temp_humid:
+        temp = temp_humid[0]
+        humid = temp_humid[1]
+    else:
+        pass
     mqtt_connect.publish("est/si/sihs/ajv/temperature", temp)
     mqtt_connect.publish("est/si/sihs/ajv/temperature", humid)
 
@@ -31,34 +27,28 @@ while True:
     mqtt_connect.publish("est/si/sihs/ajv/weather", weather)
 
     if(humid >= 60 and weather not in list_bad_weather):
-        setStepMotor(512, 0)
-        window = "on"
+        set_window("on")
         if(humid >= 80):
-            turn_on()
-            relay_flag = "on"
+            set_relay("on")
         elif(humid < 80):
-            turn_off()
-            relay_flag = "off"
+            set_relay("off")
         #registrar no bd
     elif(humid <= 50):
-        setStepMotor(512, 1)
-        window = "off"
-        turn_off()
-        relay_flag = "off"
+        set_window("off")
+        set_relay("off")
     elif(temp > 26):
-        turn_on()
-        relay_flag = "on"
+        set_relay("on")
         if(weather not in list_bad_weather):
-            setStepMotor(512, 0)
-            window_flag = "on"
+            set_window("on")
     else:
-        turn_off()
-        relay_flag = "off"
-        setStepMotor(512, 1)
-        window_flag = "off"
-
-    mqtt_connect.publish("est/si/sihs/ajv/stepmotor", window_flag)
-    mqtt_connect.publish("est/si/sihs/ajv/relay", relay_flag)
+        set_window("off")
+        set_relay("off")
+    
+    window = read_window_flag()
+    relay = read_relay_flag()
+    print("flags:", window)
+    mqtt_connect.publish("est/si/sihs/ajv/stepmotor", window)
+    mqtt_connect.publish("est/si/sihs/ajv/relay", relay)
 
     time.sleep((10*60))
 
