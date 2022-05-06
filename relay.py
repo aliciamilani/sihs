@@ -11,6 +11,7 @@ def turn_on():
 def turn_off():
     GPIO.output(RELAIS_1_GPIO, False)
 
+
 #for i in range(10):
     #print('liga')
     ##ime.sleep(1)

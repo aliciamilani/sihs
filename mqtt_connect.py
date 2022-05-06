@@ -40,14 +40,14 @@ def publish(topic, msg):
         # print(f"Failed to send message to topic {topic}")
         return 0
 
-def run():
+# def run():
     # publish
     # # client.loop_start()
     # publish(client)
     
     # subscribe
-    subscribe("est/si/sihs/weather")
-    client.loop_forever()
+    # subscribe("est/si/sihs/ajv/weather")
+    # client.loop_forever()
 
 def subscribe(topic):
     def on_message(client, userdata, msg):
