@@ -13,7 +13,7 @@ instance = dht11.DHT11(pin=23)
 def read_temp_humidity():
     result = instance.read()
     if result.is_valid():
-        return [result.temperature, result.humidity]
+        return result.temperature, result.humidity
     else:
         return 0
 

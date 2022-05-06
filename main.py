@@ -1,51 +1,65 @@
 from sqlalchemy import true
 import mqtt_connect
-# import time
+import time
 from weather_api import get_weather
-# from step_motor import setStepMotor
-# from sensor_dht11 import dht11_read
-# from relay import turn_on, turn_off
+from step_motor import setStepMotor
+from sensor_dht11 import dht11_read
+from relay import turn_on, turn_off
 
-# API
-response = get_weather()
-
+#flags
 relay_flag = "off"
-stepmotor = "off"
+window_flag = "off"
 
-for i in range(10):
-    tempo = get_weather()
+def set_relay(flag):
+    relay_flag = flag
 
-    # print(f"Tempo:{tempo}")
-    # print("Motor girando sentido horario")
+def set_window(flag):
+    window_flag = flag
 
-    # setStepMotor(512, 1)
+list_bad_weather = ['rain', 'thunderstorm']
 
-    # temp_hum = dht11_read.read_temp_humidity()
+mqtt_connect.start_subscribe("est/si/sihs/ajv/relay/cmd")
+mqtt_connect.start_subscribe("est/si/sihs/ajv/stepmotor/cmd")
 
-    # if temp_hum:
-    #     print(f"Temperatura: {temp_hum[0]}C")
-    #     print(f"Umidade: {temp_hum[1]}%")
-        
-    # mqtt_connect.publish("est/si/sihs/ajv/weather", response)
-    # mqtt_connect.publish("est/si/sihs/ajv/humidity", temp_hum[1])
-    # mqtt_connect.publish("est/si/sihs/ajv/temperature", temp_hum[0])
-    # mqtt_connect.publish("est/si/sihs/ajv/relay", relay_flag)
-    # mqtt_connect.publish("est/si/sihs/ajv/stepmotor", stepmotor)
+while True:
 
-    mqtt_connect.publish("est/si/sihs/ajv/weather", "banana")
-    mqtt_connect.publish("est/si/sihs/ajv/humidity", 74)
-    mqtt_connect.publish("est/si/sihs/ajv/temperature", 40)
-    mqtt_connect.publish("est/si/sihs/ajv/relay", "off")
-    mqtt_connect.publish("est/si/sihs/ajv/stepmotor", "on")
+    temp, humid = dht11_read.read_temp_humidity()
+    mqtt_connect.publish("est/si/sihs/ajv/temperature", temp)
+    mqtt_connect.publish("est/si/sihs/ajv/temperature", humid)
 
-    # subscribe("est/si/sihs/ajv/relay/cmd")
-    # subscribe("est/si/sihs/ajv/stepmotor/cmd")
+    weather = get_weather()
+    mqtt_connect.publish("est/si/sihs/ajv/weather", weather)
 
-    # print("Ligando Rele")
+    if(humid >= 60 and weather not in list_bad_weather):
+        setStepMotor(512, 0)
+        window = "on"
+        if(humid >= 80):
+            turn_on()
+            relay_flag = "on"
+        elif(humid < 80):
+            turn_off()
+            relay_flag = "off"
+        #registrar no bd
+    elif(humid <= 50):
+        setStepMotor(512, 1)
+        window = "off"
+        turn_off()
+        relay_flag = "off"
+    elif(temp > 26):
+        turn_on()
+        relay_flag = "on"
+        if(weather not in list_bad_weather):
+            setStepMotor(512, 0)
+            window_flag = "on"
+    else:
+        turn_off()
+        relay_flag = "off"
+        setStepMotor(512, 1)
+        window_flag = "off"
 
-    # turn_on()
-    # time.sleep(1)
+    mqtt_connect.publish("est/si/sihs/ajv/stepmotor", window_flag)
+    mqtt_connect.publish("est/si/sihs/ajv/relay", relay_flag)
 
-    # print("desligando rele")
+    time.sleep((10*60))
 
-    # turn_off()
+#BANCO #BANCO #BANCO #BANCO #BANCO #BANCO #BANCO #BANCO #BANCO

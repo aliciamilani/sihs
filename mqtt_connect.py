@@ -1,9 +1,9 @@
-
-# python 3.6
-
 import random
+# from main import set_relay, set_window
 import time
 from paho.mqtt import client as mqtt_client
+# from relay import turn_on, turn_off
+# from step_motor import setStepMotor
 
 broker = 'test.mosquitto.org'
 port = 1883
@@ -49,12 +49,31 @@ def publish(topic, msg):
     # subscribe("est/si/sihs/ajv/weather")
     # client.loop_forever()
 
+def start_subscribe(topic):
+    subscribe(topic)
+    while True:
+        client.loop()
+        time.sleep(10)
+
 def subscribe(topic):
     def on_message(client, userdata, msg):
         print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
+        print("funciona pf")
+        # if(msg.payload.decode() == "onRelay"):
+        #     turn_on()
+        #     set_relay("on")
+        # elif(msg.payload.decode() == "offRelay"):
+        #     turn_off()
+        #     set_relay("off")
+        # elif(msg.payload.decode() == "onWindow"):
+        #     setStepMotor(512, 0)
+        #     set_window("on")
+        # elif(msg.payload.decode() == "offWindow"):
+        #     setStepMotor(512, 1)
+        #     set_window("off")
         # return msg.payload.decode()
     client.subscribe(topic)
     client.on_message = on_message
 
 if __name__ == '__main__':
-    run()
+    start_subscribe("test/python")
