@@ -1,4 +1,19 @@
-from connection import get_connection
+import urllib.parse as up
+import psycopg2
+
+def get_connection(): 
+    up.uses_netloc.append("postgres")
+    url = up.urlparse("postgres://ypaibyic:Xle0xasKnchcl2axyn2SPd_n16jAanbk@kesavan.db.elephantsql.com/ypaibyic")
+    conn = psycopg2.connect(database=url.path[1:],
+        user=url.username,
+        password=url.password,
+        host=url.hostname,
+        port=url.port
+    )
+
+    cursor = conn.cursor()
+
+    return conn, cursor
 
 conn, cursor = get_connection()
 
@@ -48,9 +63,11 @@ def search_climate (climate):
     cursor.execute(f''' SELECT climate_id FROM climates WHERE climate_type = '{climate}' ''')
     return cursor.fetchall()[0][0]
 
-conn.commit()
-cursor.close()
-conn.close()
+def commit_close():
+    conn.commit()
+    cursor.close()
+    conn.close()
+    
 
 # import datetime
 # current = datetime.datetime.now() 

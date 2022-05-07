@@ -4,7 +4,7 @@ import time
 from weather_api import get_weather
 from sensor_dht11 import dht11_read
 from control_relay_step import set_relay, set_window, read_relay_flag, read_window_flag
-from database import insert_table
+from database.insert_table import insert_historics, search_climate, commit_close
 
 
 import datetime
@@ -21,19 +21,23 @@ while True:
     print("vai ler")
 
     temp_humid = dht11_read.read_temp_humidity()
+    print('Variavel', temp_humid)
     if temp_humid:
         temp = temp_humid[0]
         humid = temp_humid[1]
     else:
-        pass
+        time.sleep(2)
+        continue
     mqtt_connect.publish("est/si/sihs/ajv/temperature", temp)
     mqtt_connect.publish("est/si/sihs/ajv/temperature", humid)
 
     weather = get_weather()
     mqtt_connect.publish("est/si/sihs/ajv/weather", weather)
-
-    if(humid >= 60 and weather not in list_bad_weather):
+    
+    elif(humid >= 60 and weather not in list_bad_weather):
+        print('ola meninas')
         set_window("on")
+        
         if(humid >= 80):
             set_relay("on")
         elif(humid < 80):
@@ -57,14 +61,18 @@ while True:
     mqtt_connect.publish("est/si/sihs/ajv/stepmotor", window)
     mqtt_connect.publish("est/si/sihs/ajv/relay", relay)
 
-    time.sleep(10)
+    time.sleep(5)
 
-    insert_table.insert_historics("Relay", read_relay_flag(), current.date(), current.time(), 
-                    humid, temp, insert_table.search_climate(weather), 1)
+    insert_historics("Relay", read_relay_flag(), current.date(), current.time(), 
+                    humid, temp, search_climate(weather), 1)
 
-    time.sleep(10)
+    time.sleep(5)
 
-    insert_table.insert_historics("Window", read_window_flag(), current.date(), current.time(), 
-                    humid, temp, insert_table.search_climate(weather), 1)
+    insert_historics("Window", read_window_flag(), current.date(), current.time(), 
+                    humid, temp, search_climate(weather), 1)
+    
+    commit_close()
+    
+    print('enviou')
 
     time.sleep((10*60))
