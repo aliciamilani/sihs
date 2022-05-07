@@ -40,30 +40,45 @@ def publish(topic, msg):
         # print(f"Failed to send message to topic {topic}")
         return 0
 
-def start_subscribe(topic, period):
-    subscribe(topic)
+def subscribe_stepmotor(topic):
+    def on_message(client, userdata, msg):
+        
+        print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
+        if(msg.payload.decode() == "on"):
+            print("entrou no on")
+            set_window("on")
+        elif(msg.payload.decode() == "off"):
+            print("entrou no off")
+            set_window("off")
+    
+    client.subscribe(topic)
+    client.on_message = on_message
+
+def subscribe_relay(topic):
+    def on_message(client, userdata, msg):
+        
+        print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
+        if(msg.payload.decode() == "on"):
+            print("entrou no on")
+            set_relay("on")
+        elif(msg.payload.decode() == "off"):
+            print("entrou no off")
+            set_relay("off")
+    
+    client.subscribe(topic)
+    client.on_message = on_message
+
+def start_subscribe_relay(topic, period):
+    subscribe_relay(topic)
     while True:
         client.loop()
         time.sleep(period)
 
-def subscribe(topic):
-    def on_message(client, userdata, msg):
-        
-        print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
-        
-        if(topic == "est/si/sihs/ajv/relay/cmd"):
-            if(msg.payload.decode() == "on"):
-                 set_relay("on")
-            elif(msg.payload.decode() == "off"):
-                 set_relay("off")
-        if(topic == "est/si/sihs/ajv/stepmotor/cmd"):
-            if(msg.payload.decode() == "on"):
-                 set_window("on")
-            elif(msg.payload.decode() == "off"):
-                 set_window("off")
-        # return msg.payload.decode()
-    client.subscribe(topic)
-    client.on_message = on_message
+def start_subscribe_stepmotor(topic, period):
+    subscribe_stepmotor(topic)
+    while True:
+        client.loop()
+        time.sleep(period)
 
 #if __name__ == '__main__':
     #start_subscribe("est/si/sihs/ajv/stepmotor/cmd", 1)

@@ -12,9 +12,10 @@ import datetime
 
 list_bad_weather = ['Rain', 'Thunderstorm', "Drizzle", "Squall"]
 
-topic_stepmotor = threading.Thread(target=mqtt_connect.start_subscribe, args=("est/si/sihs/ajv/stepmotor/cmd", 10))
+topic_stepmotor = threading.Thread(target=mqtt_connect.start_subscribe_stepmotor, args=("est/si/sihs/ajv/stepmotor/cmd", 10))
 topic_stepmotor.start()
-topic_relay = threading.Thread(target=mqtt_connect.start_subscribe, args=("est/si/sihs/ajv/relay/cmd", 12))
+
+topic_relay = threading.Thread(target=mqtt_connect.start_subscribe_relay, args=("est/si/sihs/ajv/relay/cmd", 12))
 topic_relay.start()
 
 
