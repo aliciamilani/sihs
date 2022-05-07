@@ -34,27 +34,19 @@ while True:
     weather = get_weather()
     mqtt_connect.publish("est/si/sihs/ajv/weather", weather)
     
-    elif(humid >= 60 and weather not in list_bad_weather):
-        print('ola meninas')
-        set_window("on")
-        
-        if(humid >= 80):
-            set_relay("on")
-        elif(humid < 80):
+    if (weather in list_bad_weather or humid <= 60):
+        set_window("off")
+        set_relay("off")
+
+    else:
+        if (humid > 60 and humid <= 80):
+            set_window("on")
             set_relay("off")
 
-    elif(humid <= 50):
-        set_window("off")
-        set_relay("off")
-
-    elif(temp > 26):
-        set_relay("on")
-        if(weather not in list_bad_weather):
+        elif (humid > 80):
             set_window("on")
-    else:
-        set_window("off")
-        set_relay("off")
-    
+            set_relay("on")
+
     window = read_window_flag()
     relay = read_relay_flag()
     print("flags:", window)
