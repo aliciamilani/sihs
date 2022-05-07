@@ -15,7 +15,10 @@ def get_connection():
 
     return conn, cursor
 
-conn, cursor = get_connection()
+def commit_close(conn, cursor):
+    conn.commit()
+    cursor.close()
+    conn.close()
 
 def insert_climates(climate_type):
     cursor.execute(f''' INSERT INTO climates (
@@ -39,6 +42,7 @@ def insert_users(user_name, user_email, user_password):
 
 def insert_historics(history_device, history_action, history_date, history_time, 
                     history_humidity, history_temperature, history_climate_id, history_user_id):
+    conn, cursor = get_connection()
     cursor.execute(f''' INSERT INTO historics (
                             history_device,
                             history_action,
@@ -58,15 +62,17 @@ def insert_historics(history_device, history_action, history_date, history_time,
                             {history_climate_id},
                             {history_user_id}
                         )''')
+    commit_close(conn, cursor)
 
 def search_climate (climate):
+    conn, cursor = get_connection()
     cursor.execute(f''' SELECT climate_id FROM climates WHERE climate_type = '{climate}' ''')
-    return cursor.fetchall()[0][0]
+    resp = cursor.fetchall()[0][0]
+    commit_close(conn, cursor)
+    
+    return resp
 
-def commit_close():
-    conn.commit()
-    cursor.close()
-    conn.close()
+
     
 
 # import datetime

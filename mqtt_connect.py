@@ -40,27 +40,30 @@ def publish(topic, msg):
         # print(f"Failed to send message to topic {topic}")
         return 0
 
-def start_subscribe(topic):
+def start_subscribe(topic, period):
     subscribe(topic)
     while True:
         client.loop()
-        time.sleep(1)
+        time.sleep(period)
 
 def subscribe(topic):
     def on_message(client, userdata, msg):
+        
         print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
-        print(msg.payload.decode() == "offRelay")
-        if(msg.payload.decode() == "onRelay"):
-             set_relay("on")
-        elif(msg.payload.decode() == "offRelay"):
-             set_relay("off")
-        elif(msg.payload.decode() == "onWindow"):
-             set_window("on")
-        elif(msg.payload.decode() == "offWindow"):
-             set_window("off")
+        
+        if(topic == "est/si/sihs/ajv/relay/cmd"):
+            if(msg.payload.decode() == "on"):
+                 set_relay("on")
+            elif(msg.payload.decode() == "off"):
+                 set_relay("off")
+        if(topic == "est/si/sihs/ajv/stepmotor/cmd"):
+            if(msg.payload.decode() == "on"):
+                 set_window("on")
+            elif(msg.payload.decode() == "off"):
+                 set_window("off")
         # return msg.payload.decode()
     client.subscribe(topic)
     client.on_message = on_message
 
 #if __name__ == '__main__':
-    #start_subscribe("test/python")
+    #start_subscribe("est/si/sihs/ajv/stepmotor/cmd", 1)
