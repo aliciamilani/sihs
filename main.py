@@ -4,11 +4,17 @@ import time
 from weather_api import get_weather
 from sensor_dht11 import dht11_read
 from control_relay_step import set_relay, set_window, read_relay_flag, read_window_flag
+from database import insert_table
 
-list_bad_weather = ['rain', 'thunderstorm']
+
+import datetime
+current = datetime.datetime.now() 
+
+list_bad_weather = ['Rain', 'Thunderstorm', "Drizzle", "Squall"]
 
 #mqtt_connect.start_subscribe("est/si/sihs/ajv/relay/cmd")
 #mqtt_connect.start_subscribe("est/si/sihs/ajv/stepmotor/cmd")
+
 
 while True:
     
@@ -32,10 +38,11 @@ while True:
             set_relay("on")
         elif(humid < 80):
             set_relay("off")
-        #registrar no bd
+
     elif(humid <= 50):
         set_window("off")
         set_relay("off")
+
     elif(temp > 26):
         set_relay("on")
         if(weather not in list_bad_weather):
@@ -50,6 +57,14 @@ while True:
     mqtt_connect.publish("est/si/sihs/ajv/stepmotor", window)
     mqtt_connect.publish("est/si/sihs/ajv/relay", relay)
 
-    time.sleep((10*60))
+    time.sleep(10)
 
-#BANCO #BANCO #BANCO #BANCO #BANCO #BANCO #BANCO #BANCO #BANCO
+    insert_table.insert_historics("Relay", read_relay_flag(), current.date(), current.time(), 
+                    humid, temp, insert_table.search_climate(weather), 1)
+
+    time.sleep(10)
+
+    insert_table.insert_historics("Window", read_window_flag(), current.date(), current.time(), 
+                    humid, temp, insert_table.search_climate(weather), 1)
+
+    time.sleep((10*60))
