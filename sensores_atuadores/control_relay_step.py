@@ -1,6 +1,5 @@
-from relay import turn_on, turn_off
-from step_motor import setStepMotor
-import time
+from .relay import turn_on, turn_off
+from .step_motor import setStepMotor
 
 relay_flag = "off"
 window_flag = "off"
@@ -27,8 +26,6 @@ def set_window(flag):
         setStepMotor(512, 0)
     else:
         setStepMotor(512, 1)
-
-
 
 def read_relay_flag():
     return relay_flag

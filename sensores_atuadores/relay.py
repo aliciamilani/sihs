@@ -1,5 +1,4 @@
 import RPi.GPIO as GPIO
-import time
 
 GPIO.setmode(GPIO.BCM) # GPIO Numbers instead of board numbers
 RELAIS_1_GPIO = 24
@@ -10,13 +9,3 @@ def turn_on():
 
 def turn_off():
     GPIO.output(RELAIS_1_GPIO, True)
-
-
-#for i in range(10):
-    #print('liga')
-    ##ime.sleep(1)
-    #print('desliga')
-    #turn_off()
-    #time.sleep(1)
-
-#GPIO.cleanup()

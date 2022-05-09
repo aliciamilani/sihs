@@ -1,4 +1,3 @@
-
 import RPi.GPIO as GPIO
 import time
 
@@ -34,13 +33,3 @@ def setStepMotor(step,sent):
             for pin in range(4):
                 GPIO.output(control_pins[pin],halfstep_seq[halfstep][pin])
             time.sleep(0.001)
-
-#try:
-    #while True:
-        #step=input("Quantos passos: ")
-        #sent=input("Sentido horario(1), Sentido anti-horario(0): ")
-        #setStepMotor(int(step)*512,int(sent))
-#except KeyboardInterrupt:
-    #pas
-
-#GPIO.cleanup()

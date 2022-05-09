@@ -1,5 +1,5 @@
 import random
-from control_relay_step import set_relay, set_window
+from sensores_atuadores.control_relay_step import set_relay, set_window
 import time
 from paho.mqtt import client as mqtt_client
 
