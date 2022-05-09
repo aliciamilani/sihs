@@ -2,21 +2,21 @@
 import mqtt_connect
 import threading
 import time
+import datetime
 from weather_api import get_weather
 from sensor_dht11 import dht11_read
 from control_relay_step import set_relay, set_window, read_relay_flag, read_window_flag
 from database.insert_table import insert_historics, search_climate, commit_close
 
-
-import datetime
-
 list_bad_weather = ['Rain', 'Thunderstorm', "Drizzle", "Squall"]
 
-topic_stepmotor = threading.Thread(target=mqtt_connect.start_subscribe_stepmotor, args=("est/si/sihs/ajv/stepmotor/cmd", 10))
+topic_stepmotor = threading.Thread(target=mqtt_connect.start_subscribe_stepmotor, args=("est/si/sihs/ajv/stepmotor/cmd", 10,))
 topic_stepmotor.start()
 
-topic_relay = threading.Thread(target=mqtt_connect.start_subscribe_relay, args=("est/si/sihs/ajv/relay/cmd", 12))
+topic_relay = threading.Thread(target=mqtt_connect.start_subscribe_relay, args=("est/si/sihs/ajv/relay/cmd", 12,))
 topic_relay.start()
+
+time.sleep(5)
 
 
 while True:

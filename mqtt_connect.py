@@ -2,18 +2,14 @@ import random
 from control_relay_step import set_relay, set_window
 import time
 from paho.mqtt import client as mqtt_client
-from relay import turn_on, turn_off
-from step_motor import setStepMotor
 
 broker = 'test.mosquitto.org'
 port = 1883
 topic = "python/mqtt"
-# generate client ID with pub prefix randomly
-client_id = f'python-mqtt-{random.randint(0, 1000)}'
-# username = 'emqx'
-# password = 'public
 
 def connect_mqtt():
+
+    client_id = f'python-mqtt-{random.randint(0, 1000)}'
     def on_connect(client, userdata, flags, rc):
         if rc == 0:
             print("Connected to MQTT Broker!")
@@ -27,6 +23,8 @@ def connect_mqtt():
     return client
 
 client = connect_mqtt()
+client_stepmotor = connect_mqtt()
+client_relay = connect_mqtt()
 
 
 def publish(topic, msg):
@@ -45,39 +43,39 @@ def subscribe_stepmotor(topic):
         
         print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
         if(msg.payload.decode() == "on"):
-            print("entrou no on")
+            print("entrou no on do motor")
             set_window("on")
         elif(msg.payload.decode() == "off"):
-            print("entrou no off")
+            print("entrou no off do motor")
             set_window("off")
     
-    client.subscribe(topic)
-    client.on_message = on_message
+    client_stepmotor.subscribe(topic)
+    client_stepmotor.on_message = on_message
 
 def subscribe_relay(topic):
     def on_message(client, userdata, msg):
         
         print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
         if(msg.payload.decode() == "on"):
-            print("entrou no on")
+            print("entrou no on do relay")
             set_relay("on")
         elif(msg.payload.decode() == "off"):
-            print("entrou no off")
+            print("entrou no off do relay")
             set_relay("off")
     
-    client.subscribe(topic)
-    client.on_message = on_message
+    client_relay.subscribe(topic)
+    client_relay.on_message = on_message
 
 def start_subscribe_relay(topic, period):
     subscribe_relay(topic)
     while True:
-        client.loop()
+        client_relay.loop()
         time.sleep(period)
 
 def start_subscribe_stepmotor(topic, period):
     subscribe_stepmotor(topic)
     while True:
-        client.loop()
+        client_stepmotor.loop()
         time.sleep(period)
 
 #if __name__ == '__main__':
